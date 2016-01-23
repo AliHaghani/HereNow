@@ -23,10 +23,12 @@ public class MainActivity extends FragmentActivity implements GoogleApiClient.On
 
     GoogleApiClient mGoogleApiClient;
     AutoCompleteAdapter mAdapter;
+    Contacts ContactsList;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
+        ContactsList = new Contacts();
         setContentView(R.layout.activity_main);
         //--Snippet
         mGoogleApiClient = new GoogleApiClient
@@ -102,5 +104,6 @@ public class MainActivity extends FragmentActivity implements GoogleApiClient.On
 
         int phoneIndex = cursor.getColumnIndex(ContactsContract.CommonDataKinds.Phone.NUMBER);
         phoneNo = cursor.getString(phoneIndex);
+        ContactsList.add(phoneNo);
     }
 }
