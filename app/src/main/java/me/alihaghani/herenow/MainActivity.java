@@ -5,6 +5,7 @@ import android.content.pm.PackageManager;
 import android.support.v4.app.FragmentActivity;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
+import android.widget.AutoCompleteTextView;
 
 import com.google.android.gms.common.ConnectionResult;
 import com.google.android.gms.common.api.GoogleApiClient;
@@ -13,6 +14,7 @@ import com.google.android.gms.location.places.Places;
 public class MainActivity extends FragmentActivity implements GoogleApiClient.OnConnectionFailedListener, GoogleApiClient.ConnectionCallbacks {
 
     GoogleApiClient mGoogleApiClient;
+    AutoCompleteAdapter mAdapter;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -42,6 +44,13 @@ public class MainActivity extends FragmentActivity implements GoogleApiClient.On
             mGoogleApiClient.disconnect();
         }
         super.onStop();
+
+        if( mGoogleApiClient != null && mGoogleApiClient.isConnected() ) {
+            mAdapter.setGoogleApiClient( null );
+            mGoogleApiClient.disconnect();
+        }
+        super.onStop();
+
     }
 
 
@@ -52,7 +61,8 @@ public class MainActivity extends FragmentActivity implements GoogleApiClient.On
 
     @Override
     public void onConnected(Bundle bundle) {
-        
+        if( mAdapter != null )
+            mAdapter.setGoogleApiClient( mGoogleApiClient );
     }
 
     @Override
