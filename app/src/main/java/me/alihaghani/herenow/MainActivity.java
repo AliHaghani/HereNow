@@ -3,15 +3,15 @@ package me.alihaghani.herenow;
 import android.app.Fragment;
 import android.content.Intent;
 import android.content.pm.PackageManager;
+import android.database.Cursor;
+import android.net.Uri;
 import android.provider.ContactsContract;
 import android.support.v4.app.FragmentActivity;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
 import android.util.Log;
 import android.view.View;
-=======
 import android.widget.AutoCompleteTextView;
->>>>>>> origin/master
 
 import com.google.android.gms.common.ConnectionResult;
 import com.google.android.gms.common.api.GoogleApiClient;
@@ -92,16 +92,15 @@ public class MainActivity extends FragmentActivity implements GoogleApiClient.On
     }
 
     protected void onActivityResult(int requestCode, int resultCode, Intent data) {
-        if (resultCode == RESULT_OK) {
-            switch (requestCode) {
-                case CONTACT_PICKER_RESULT:
-                    // handle contact results
-                    break;
-            }
+        Intent intent = new Intent(Intent.ACTION_PICK, ContactsContract.CommonDataKinds.Phone.CONTENT_URI);
+        startActivityForResult(intent, 1);
 
-        } else {
-            // gracefully handle failure
-            Log.w(DEBUG_TAG, "Warning: activity result not ok");
-        }
+        String phoneNo = null;
+        Uri uri = data.getData();
+        Cursor cursor = getContentResolver().query(uri, null, null, null, null);
+        cursor.moveToFirst();
+
+        int phoneIndex = cursor.getColumnIndex(ContactsContract.CommonDataKinds.Phone.NUMBER);
+        phoneNo = cursor.getString(phoneIndex);
     }
 }
