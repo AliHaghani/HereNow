@@ -9,6 +9,9 @@ import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
 import android.util.Log;
 import android.view.View;
+=======
+import android.widget.AutoCompleteTextView;
+>>>>>>> origin/master
 
 import com.google.android.gms.common.ConnectionResult;
 import com.google.android.gms.common.api.GoogleApiClient;
@@ -19,6 +22,7 @@ import static android.support.v4.app.ActivityCompat.startActivityForResult;
 public class MainActivity extends FragmentActivity implements GoogleApiClient.OnConnectionFailedListener, GoogleApiClient.ConnectionCallbacks {
 
     GoogleApiClient mGoogleApiClient;
+    AutoCompleteAdapter mAdapter;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -48,6 +52,13 @@ public class MainActivity extends FragmentActivity implements GoogleApiClient.On
             mGoogleApiClient.disconnect();
         }
         super.onStop();
+
+        if( mGoogleApiClient != null && mGoogleApiClient.isConnected() ) {
+            mAdapter.setGoogleApiClient( null );
+            mGoogleApiClient.disconnect();
+        }
+        super.onStop();
+
     }
 
 
@@ -58,7 +69,8 @@ public class MainActivity extends FragmentActivity implements GoogleApiClient.On
 
     @Override
     public void onConnected(Bundle bundle) {
-        
+        if( mAdapter != null )
+            mAdapter.setGoogleApiClient( mGoogleApiClient );
     }
 
     @Override
