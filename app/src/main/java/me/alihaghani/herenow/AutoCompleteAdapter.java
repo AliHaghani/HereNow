@@ -117,4 +117,26 @@ public class AutoCompleteAdapter extends ArrayAdapter implements Filterable {
                             }
                         }, 60, TimeUnit.SECONDS );
     }
+
+    private class ViewHolder {
+        private TextView text;
+
+        @Override
+        public View getView( int position, View convertView, ViewGroup parent ) {
+            ViewHolder holder;
+
+            if( convertView == null ) {
+                holder = new ViewHolder();
+                convertView = LayoutInflater.from( getContext() ).inflate( android.R.layout.simple_list_item_1, parent, false  );
+                holder.text = (TextView) convertView.findViewById( android.R.id.text1 );
+                convertView.setTag( holder );
+            } else {
+                holder = (ViewHolder) convertView.getTag();
+            }
+
+            holder.text.setText( getItem( position ).getDescription() );
+
+            return convertView;
+        }
+    }
 }
