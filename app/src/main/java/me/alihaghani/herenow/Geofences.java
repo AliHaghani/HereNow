@@ -17,24 +17,30 @@ public class Geofences {
     float radius;
     long expiration;
 
+    static Geofence ourFence;
+
+
 
     public Geofences(double lat, double lon, float radius, long expiration) {
         this.lat = lat;
         this.lon = lon;
         this.radius = radius;
         this.expiration = expiration;
+        buildGeofence();
     }
 
     public void buildGeofence() {
         Geofence.Builder builder = new Geofence.Builder();
         builder.setCircularRegion(lat, lon, radius);
         builder.setExpirationDuration(expiration);
+        builder.setTransitionTypes(Geofence.GEOFENCE_TRANSITION_ENTER);
+        ourFence = builder.build();
     }
 
     private GeofencingRequest getGeofencingRequest() {
         GeofencingRequest.Builder builder = new GeofencingRequest.Builder();
         builder.setInitialTrigger(GeofencingRequest.INITIAL_TRIGGER_ENTER);
-        builder.addGeofences(mGeofenceList);
+        //builder.addGeofences(mGeofenceList);
         return builder.build();
     }
 
