@@ -15,7 +15,12 @@ import android.widget.AutoCompleteTextView;
 
 import com.google.android.gms.common.ConnectionResult;
 import com.google.android.gms.common.api.GoogleApiClient;
+import com.google.android.gms.common.api.Status;
+import com.google.android.gms.location.places.Place;
 import com.google.android.gms.location.places.Places;
+import com.google.android.gms.location.places.ui.PlaceAutocompleteFragment;
+import com.google.android.gms.location.places.ui.PlaceSelectionListener;
+import com.google.android.gms.maps.model.LatLng;
 
 import static android.support.v4.app.ActivityCompat.startActivityForResult;
 
@@ -28,7 +33,7 @@ public class MainActivity extends FragmentActivity implements GoogleApiClient.On
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
-        //--Snippet
+        //Initialize GoogleApiClient
         mGoogleApiClient = new GoogleApiClient
                 .Builder( this )
                 .enableAutoManage( this, 0, this )
@@ -37,6 +42,28 @@ public class MainActivity extends FragmentActivity implements GoogleApiClient.On
                 .addConnectionCallbacks( this )
                 .addOnConnectionFailedListener( this )
                 .build();
+
+        PlaceAutocompleteFragment autocompleteFragment = (PlaceAutocompleteFragment)
+                getFragmentManager().findFragmentById(R.id.place_autocomplete_fragment);
+
+        autocompleteFragment.setOnPlaceSelectedListener(new PlaceSelectionListener() {
+            @Override
+            public void onPlaceSelected(Place place) {
+                LatLng latLng = place.getLatLng();
+                Log.d("lat", "lat =" + latLng.latitude);
+                Log.d("long", "long = " + latLng.longitude);
+            }
+
+            @Override
+            public void onError(Status status) {
+                // TODO: Handle the error.
+                Log.i("statusError", "An error occurred: " + status);
+            }
+        });
+
+
+
+
     }
 
     @Override
@@ -79,7 +106,7 @@ public class MainActivity extends FragmentActivity implements GoogleApiClient.On
     }
 
 
-    private static final int CONTACT_PICKER_RESULT = 1001;
+    private final int CONTACT_PICKER_RESULT = 2015;
     private int RESULT_OK;
     private String DEBUG_TAG;
 
@@ -87,20 +114,40 @@ public class MainActivity extends FragmentActivity implements GoogleApiClient.On
 
     public void doLaunchContactPicker(View view) {
         Intent contactPickerIntent = new Intent(Intent.ACTION_PICK,
-                ContactsContract.Contacts.CONTENT_URI);
+                ContactsContract.CommonDataKinds.Phone.CONTENT_URI);
         startActivityForResult(contactPickerIntent, CONTACT_PICKER_RESULT);
     }
 
     protected void onActivityResult(int requestCode, int resultCode, Intent data) {
-        Intent intent = new Intent(Intent.ACTION_PICK, ContactsContract.CommonDataKinds.Phone.CONTENT_URI);
-        startActivityForResult(intent, 1);
+        if(requestCode == CONTACT_PICKER_RESULT) {
+            Uri uri = data.getData();
+            Cursor cur = getContentResolver().query(uri, null, null, null, null);
+            cur.moveToFirst();
+            int col = cur.getColumnIndex(ContactsContract.CommonDataKinds.Phone.NUMBER);
+            String num = cur.getString(col);
 
-        String phoneNo = null;
-        Uri uri = data.getData();
-        Cursor cursor = getContentResolver().query(uri, null, null, null, null);
-        cursor.moveToFirst();
+        }
 
-        int phoneIndex = cursor.getColumnIndex(ContactsContract.CommonDataKinds.Phone.NUMBER);
-        phoneNo = cursor.getString(phoneIndex);
+
+    }
+
+
+    public String GetPhoneNumber(String id)
+    {
+        String number = "";
+        Cursor phones = getContentResolver().query(ContactsContract.CommonDataKinds.Phone.CONTENT_URI, null, ContactsContract.CommonDataKinds.Phone._ID + " = " + id, null, null);
+
+        if(phones.getCount() > 0)
+        {
+            while(phones.moveToNext())
+            {
+                number = phones.getString(phones.getColumnIndex(ContactsContract.CommonDataKinds.Phone.NUMBER));
+            }
+
+        }
+
+        phones.close();
+
+        return number;
     }
 }
