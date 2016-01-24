@@ -29,9 +29,28 @@ public class MainActivity extends FragmentActivity implements GoogleApiClient.On
     GoogleApiClient mGoogleApiClient;
     AutoCompleteAdapter mAdapter;
 
+<<<<<<< Updated upstream
+=======
+    private PendingIntent getGeofencePendingIntent() {
+        // Reuse the PendingIntent if we already have it.
+        if (mGeofencePendingIntent != null) {
+            return mGeofencePendingIntent;
+        }
+        Intent intent = new Intent(this, GeofenceTransitionsIntentService.class);
+        // We use FLAG_UPDATE_CURRENT so that we get the same pending intent back when
+        // calling addGeofences() and removeGeofences().
+        return PendingIntent.getService(this, 0, intent, PendingIntent.
+                FLAG_UPDATE_CURRENT);
+
+    }
+
+
+>>>>>>> Stashed changes
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
+
         setContentView(R.layout.activity_main);
         //Initialize GoogleApiClient
         mGoogleApiClient = new GoogleApiClient
@@ -148,6 +167,14 @@ public class MainActivity extends FragmentActivity implements GoogleApiClient.On
 
         phones.close();
 
+<<<<<<< HEAD
         return number;
+=======
+        int phoneIndex = cursor.getColumnIndex(ContactsContract.CommonDataKinds.Phone.NUMBER);
+        phoneNo = cursor.getString(phoneIndex);
+        Contacts.add(phoneNo);
+
+
+>>>>>>> 8fb8d066a88e5ee3ddbec38a802565e2d9cb1619
     }
 }
