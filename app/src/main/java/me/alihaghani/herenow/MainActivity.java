@@ -20,7 +20,12 @@ import com.google.android.gms.common.api.GoogleApiClient;
 import com.google.android.gms.location.Geofence;
 import com.google.android.gms.location.GeofencingEvent;
 import com.google.android.gms.location.LocationServices;
+import com.google.android.gms.common.api.Status;
+import com.google.android.gms.location.places.Place;
 import com.google.android.gms.location.places.Places;
+import com.google.android.gms.location.places.ui.PlaceAutocompleteFragment;
+import com.google.android.gms.location.places.ui.PlaceSelectionListener;
+import com.google.android.gms.maps.model.LatLng;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -33,7 +38,10 @@ public class MainActivity extends FragmentActivity implements GoogleApiClient.On
     PendingIntent mGeofencePendingIntent;
     private LocationServices mLocationService;
 
-    private PendingIntent getGeofencePendingIntent() {
+  /*  private PendingIntent getGeofencePendingIntent() {
+
+        PendingIntent mGeofencePendingIntent = null;
+>>>>>>> origin/master
         // Reuse the PendingIntent if we already have it.
 
 
@@ -42,11 +50,11 @@ public class MainActivity extends FragmentActivity implements GoogleApiClient.On
         }
         Intent intent = new Intent(this, GeofenceTransitionsIntentService.class);
         // We use FLAG_UPDATE_CURRENT so that we get the same pending intent back when
-        // calling addGeofences() and removeGeofences().
-        return PendingIntent.getService(this, 0, intent, PendingIntent.
+         calling addGeofences() and removeGeofences().
+       return PendingIntent.getService(this, 0, intent, PendingIntent.
                 FLAG_UPDATE_CURRENT);
 
-    }
+    } */
 
     private PendingIntent getGeofenceTransitionPendingIntent() {
         Intent intent = new Intent(this, GeofenceTransitionsIntentService.class);
@@ -70,9 +78,29 @@ public class MainActivity extends FragmentActivity implements GoogleApiClient.On
                     .addOnConnectionFailedListener(this)
                     .build();
 
-            super.onCreate(savedInstanceState);
-            mGoogleApiClient.connect();
-        }
+             mGoogleApiClient.connect();
+        PlaceAutocompleteFragment autocompleteFragment = (PlaceAutocompleteFragment)
+                getFragmentManager().findFragmentById(R.id.place_autocomplete_fragment);
+
+        autocompleteFragment.setOnPlaceSelectedListener(new PlaceSelectionListener() {
+            @Override
+            public void onPlaceSelected(Place place) {
+                LatLng latLng = place.getLatLng();
+                Log.d("lat", "lat =" + latLng.latitude);
+                Log.d("long", "long = " + latLng.longitude);
+            }
+
+            @Override
+            public void onError(Status status) {
+                // TODO: Handle the error.
+                Log.i("statusError", "An error occurred: " + status);
+            }
+        });
+
+
+
+
+    }
 
         @Override
         protected void onStart() {
@@ -110,36 +138,41 @@ public class MainActivity extends FragmentActivity implements GoogleApiClient.On
 
         @Override
         public void onConnectionSuspended(int i) {
-
         }
+    private final int CONTACT_PICKER_RESULT = 2015;
+    private int RESULT_OK;
+    private String DEBUG_TAG;
 
 
         private static final int CONTACT_PICKER_RESULT = 1001;
         private int RESULT_OK;
         private String DEBUG_TAG;
 
+    public void doLaunchContactPicker(View view) {
+        Intent contactPickerIntent = new Intent(Intent.ACTION_PICK,
+                ContactsContract.CommonDataKinds.Phone.CONTENT_URI);
+        startActivityForResult(contactPickerIntent, CONTACT_PICKER_RESULT);
+    }
 
-        public void doLaunchContactPicker(View view) {
-            Intent contactPickerIntent = new Intent(Intent.ACTION_PICK,
-                    ContactsContract.Contacts.CONTENT_URI);
-            startActivityForResult(contactPickerIntent, CONTACT_PICKER_RESULT);
-        }
-
-        protected void onActivityResult(int requestCode, int resultCode, Intent data) {
-            Intent intent = new Intent(Intent.ACTION_PICK, ContactsContract.CommonDataKinds.Phone.CONTENT_URI);
-            startActivityForResult(intent, 1);
-
-            String phoneNo = null;
+    protected void onActivityResult(int requestCode, int resultCode, Intent data) {
+        if(requestCode == CONTACT_PICKER_RESULT) {
             Uri uri = data.getData();
-            Cursor cursor = getContentResolver().query(uri, null, null, null, null);
-            cursor.moveToFirst();
-
-            int phoneIndex = cursor.getColumnIndex(ContactsContract.CommonDataKinds.Phone.NUMBER);
-            phoneNo = cursor.getString(phoneIndex);
-            Contacts.add(phoneNo);
-
-
+            Cursor cur = getContentResolver().query(uri, null, null, null, null);
+            cur.moveToFirst();
+            int col = cur.getColumnIndex(ContactsContract.CommonDataKinds.Phone.NUMBER);
+            String num = cur.getString(col);
+            Contacts.add(num);
         }
+
+
     }
 
 
+    public void sendSMSToPerson(View view){
+        AndroidSMS test = new AndroidSMS();
+        test.sendSMS();
+
+    }
+
+
+}

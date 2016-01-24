@@ -89,14 +89,12 @@ public class AutoCompleteAdapter extends ArrayAdapter implements Filterable {
 
     private void displayPredictiveResults( String query )
     {
-        //Southwest corner to Northeast corner.
-        LatLngBounds bounds = new LatLngBounds( new LatLng( 39.906374, -105.122337 ), new LatLng( 39.949552, -105.068779 ) );
+
 
         //Filter: https://developers.google.com/places/supported_types#table3
-        List<Integer> filterTypes = new ArrayList<Integer>();
-        filterTypes.add( Place.TYPE_ESTABLISHMENT );
 
-        Places.GeoDataApi.getAutocompletePredictions( mGoogleApiClient, query, bounds, AutocompleteFilter.create(filterTypes) )
+
+        Places.GeoDataApi.getAutocompletePredictions( mGoogleApiClient, query, null, null )
                 .setResultCallback (
                         new ResultCallback<AutocompletePredictionBuffer>() {
                             @Override
@@ -108,7 +106,7 @@ public class AutoCompleteAdapter extends ArrayAdapter implements Filterable {
                                 if( buffer.getStatus().isSuccess() ) {
                                     for( AutocompletePrediction prediction : buffer ) {
                                         //Add as a new item to avoid IllegalArgumentsException when buffer is released
-                                        //add( new AutoCompletePlace( prediction.getPlaceId(), prediction.getDescription() ) );
+                                        add( new AutoCompletePlace( prediction.getPlaceId(), prediction.getDescription() ) );
                                     }
                                 }
 
@@ -118,25 +116,24 @@ public class AutoCompleteAdapter extends ArrayAdapter implements Filterable {
                         }, 60, TimeUnit.SECONDS );
     }
 
+
+
+    private class AutoCompletePlace
+    {
+        public String placeID;
+        public String placeDescription;
+
+        public AutoCompletePlace(String placeId, String placeDescription){
+            this.placeID = placeID;
+            this.placeDescription = placeDescription;
+
+        }
+
+
+    }
+
     private class ViewHolder {
         private TextView text;
 
-        @Override
-        public View getView( int position, View convertView, ViewGroup parent ) {
-            ViewHolder holder;
-
-            if( convertView == null ) {
-                holder = new ViewHolder();
-                convertView = LayoutInflater.from( getContext() ).inflate( android.R.layout.simple_list_item_1, parent, false  );
-                holder.text = (TextView) convertView.findViewById( android.R.id.text1 );
-                convertView.setTag( holder );
-            } else {
-                holder = (ViewHolder) convertView.getTag();
-            }
-
-            holder.text.setText( getItem( position ).getDescription() );
-
-            return convertView;
-        }
     }
 }
