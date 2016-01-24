@@ -29,8 +29,6 @@ public class GeofenceTransitionsIntentService extends IntentService implements G
                 .addConnectionCallbacks(this)
                 .addOnConnectionFailedListener(this)
                 .build();
-
-
     }
 
 
@@ -55,10 +53,11 @@ public class GeofenceTransitionsIntentService extends IntentService implements G
         int geofenceTransition = geofencingEvent.getGeofenceTransition();
 
         // Test that the reported transition was of interest.
-        if (geofenceTransition == Geofence.GEOFENCE_TRANSITION_ENTER) {
+        if (geofenceTransition == Geofence.GEOFENCE_TRANSITION_ENTER || geofenceTransition == Geofence.GEOFENCE_TRANSITION_DWELL) {
 
             AndroidSMS smsSender =  new AndroidSMS();
             smsSender.sendSMS();
+
         }
     }
 

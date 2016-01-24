@@ -7,6 +7,7 @@ import com.google.android.gms.location.GeofencingRequest;
 import com.google.android.gms.location.places.Place;
 
 import java.util.ArrayList;
+import java.util.List;
 
 /**
  * Created by Ali on 2016-01-23.
@@ -18,6 +19,8 @@ public class Geofences {
     long expiration;
 
     static Geofence ourFence;
+    static List<Geofence> geoFenceList;
+    static GeofencingRequest geofencingRequest;
 
 
 
@@ -26,15 +29,23 @@ public class Geofences {
         this.lon = lon;
         this.radius = radius;
         this.expiration = expiration;
+        geoFenceList = new ArrayList<Geofence>(1);
         buildGeofence();
     }
 
-    public void buildGeofence() {
+    private void buildGeofence() {
         Geofence.Builder builder = new Geofence.Builder();
         builder.setCircularRegion(lat, lon, radius);
         builder.setExpirationDuration(expiration);
         builder.setTransitionTypes(Geofence.GEOFENCE_TRANSITION_ENTER);
+        builder.setRequestId("ourGeofenceYO");
         ourFence = builder.build();
+        geoFenceList.add(ourFence);
+
+        GeofencingRequest.Builder reqBuilder = new GeofencingRequest.Builder();
+        reqBuilder.addGeofence(ourFence);
+        geofencingRequest = reqBuilder.build();
+
     }
 
     private GeofencingRequest getGeofencingRequest() {

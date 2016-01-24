@@ -1,5 +1,6 @@
 package me.alihaghani.herenow;
 
+import android.Manifest;
 import android.app.Fragment;
 import android.app.IntentService;
 import android.app.PendingIntent;
@@ -9,6 +10,7 @@ import android.database.Cursor;
 import android.net.Uri;
 import android.provider.ContactsContract;
 import android.support.v4.app.FragmentActivity;
+import android.support.v4.content.ContextCompat;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
 import android.util.Log;
@@ -19,6 +21,7 @@ import com.google.android.gms.common.ConnectionResult;
 import com.google.android.gms.common.api.GoogleApiClient;
 import com.google.android.gms.location.Geofence;
 import com.google.android.gms.location.GeofencingEvent;
+import com.google.android.gms.location.GeofencingRequest;
 import com.google.android.gms.location.LocationServices;
 import com.google.android.gms.common.api.Status;
 import com.google.android.gms.location.places.Place;
@@ -37,24 +40,11 @@ public class MainActivity extends FragmentActivity implements GoogleApiClient.On
     GoogleApiClient mGoogleApiClient;
     PendingIntent mGeofencePendingIntent;
     private LocationServices mLocationService;
+    private double lat;
+    private double lon;
+    private float radius = 1000;
+    private long expiration = 36000;
 
-  /*  private PendingIntent getGeofencePendingIntent() {
-
-        PendingIntent mGeofencePendingIntent = null;
->>>>>>> origin/master
-        // Reuse the PendingIntent if we already have it.
-
-
-        if (mGeofencePendingIntent != null) {
-            return mGeofencePendingIntent;
-        }
-        Intent intent = new Intent(this, GeofenceTransitionsIntentService.class);
-        // We use FLAG_UPDATE_CURRENT so that we get the same pending intent back when
-         calling addGeofences() and removeGeofences().
-       return PendingIntent.getService(this, 0, intent, PendingIntent.
-                FLAG_UPDATE_CURRENT);
-
-    } */
 
     private PendingIntent getGeofenceTransitionPendingIntent() {
         Intent intent = new Intent(this, GeofenceTransitionsIntentService.class);
@@ -85,9 +75,9 @@ public class MainActivity extends FragmentActivity implements GoogleApiClient.On
         autocompleteFragment.setOnPlaceSelectedListener(new PlaceSelectionListener() {
             @Override
             public void onPlaceSelected(Place place) {
-                LatLng latLng = place.getLatLng();
-                Log.d("lat", "lat =" + latLng.latitude);
-                Log.d("long", "long = " + latLng.longitude);
+                LatLng ourLatlng = place.getLatLng();
+                lat = ourLatlng.latitude;
+                lon = ourLatlng.longitude;
             }
 
             @Override
@@ -132,28 +122,31 @@ public class MainActivity extends FragmentActivity implements GoogleApiClient.On
 
         @Override
         public void onConnected(Bundle bundle) {
-//            if (mAdapter != null)
-//                mAdapter.setGoogleApiClient(mGoogleApiClient);
+
         }
 
         @Override
         public void onConnectionSuspended(int i) {
+            if(mGeofencePendingIntent != null){
+                LocationServices.GeofencingApi.removeGeofences(mGoogleApiClient, mGeofencePendingIntent);
+            }
+
         }
-    private final int CONTACT_PICKER_RESULT = 2015;
-    private int RESULT_OK;
-    private String DEBUG_TAG;
+
 
 
         private static final int CONTACT_PICKER_RESULT = 1001;
         private int RESULT_OK;
         private String DEBUG_TAG;
 
+    //start the contact launcher
     public void doLaunchContactPicker(View view) {
         Intent contactPickerIntent = new Intent(Intent.ACTION_PICK,
                 ContactsContract.CommonDataKinds.Phone.CONTENT_URI);
         startActivityForResult(contactPickerIntent, CONTACT_PICKER_RESULT);
     }
 
+    //Get the contact they picked to notify
     protected void onActivityResult(int requestCode, int resultCode, Intent data) {
         if(requestCode == CONTACT_PICKER_RESULT) {
             Uri uri = data.getData();
@@ -168,9 +161,24 @@ public class MainActivity extends FragmentActivity implements GoogleApiClient.On
     }
 
 
+    //wrapper to send an sms to the person they selected to notify
     public void sendSMSToPerson(View view){
-        AndroidSMS test = new AndroidSMS();
-        test.sendSMS();
+
+
+    }
+
+    public void onReadyToStart(View view){
+        if(mGoogleApiClient.isConnected()){
+            Geofences geofences = new Geofences(lat, lon, radius, expiration);
+
+            mGeofencePendingIntent = getGeofenceTransitionPendingIntent();
+            if(ContextCompat.checkSelfPermission(getApplicationContext(),Manifest.permission.ACCESS_FINE_LOCATION) == PackageManager.PERMISSION_GRANTED
+                    || ContextCompat.checkSelfPermission(getApplicationContext(),Manifest.permission.ACCESS_COARSE_LOCATION) == PackageManager.PERMISSION_GRANTED) {
+                LocationServices.GeofencingApi.addGeofences(mGoogleApiClient, Geofences.geofencingRequest , mGeofencePendingIntent);
+                //below is deprecated
+                //LocationServices.GeofencingApi.addGeofences(mGoogleApiClient, Geofences.geoFenceList, mGeofencePendingIntent);
+            }
+        }
 
     }
 
