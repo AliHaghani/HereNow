@@ -1,6 +1,7 @@
 package me.alihaghani.herenow;
 
 import android.app.Fragment;
+import android.app.PendingIntent;
 import android.content.Intent;
 import android.content.pm.PackageManager;
 import android.database.Cursor;
@@ -29,23 +30,23 @@ public class MainActivity extends FragmentActivity implements GoogleApiClient.On
     GoogleApiClient mGoogleApiClient;
     AutoCompleteAdapter mAdapter;
 
-<<<<<<< Updated upstream
-=======
-    private PendingIntent getGeofencePendingIntent() {
+
+  /*  private PendingIntent getGeofencePendingIntent() {
+
+        PendingIntent mGeofencePendingIntent = null;
         // Reuse the PendingIntent if we already have it.
         if (mGeofencePendingIntent != null) {
             return mGeofencePendingIntent;
         }
         Intent intent = new Intent(this, GeofenceTransitionsIntentService.class);
         // We use FLAG_UPDATE_CURRENT so that we get the same pending intent back when
-        // calling addGeofences() and removeGeofences().
-        return PendingIntent.getService(this, 0, intent, PendingIntent.
+         calling addGeofences() and removeGeofences().
+       return PendingIntent.getService(this, 0, intent, PendingIntent.
                 FLAG_UPDATE_CURRENT);
 
-    }
+    } */
 
 
->>>>>>> Stashed changes
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -151,30 +152,4 @@ public class MainActivity extends FragmentActivity implements GoogleApiClient.On
     }
 
 
-    public String GetPhoneNumber(String id)
-    {
-        String number = "";
-        Cursor phones = getContentResolver().query(ContactsContract.CommonDataKinds.Phone.CONTENT_URI, null, ContactsContract.CommonDataKinds.Phone._ID + " = " + id, null, null);
-
-        if(phones.getCount() > 0)
-        {
-            while(phones.moveToNext())
-            {
-                number = phones.getString(phones.getColumnIndex(ContactsContract.CommonDataKinds.Phone.NUMBER));
-            }
-
-        }
-
-        phones.close();
-
-<<<<<<< HEAD
-        return number;
-=======
-        int phoneIndex = cursor.getColumnIndex(ContactsContract.CommonDataKinds.Phone.NUMBER);
-        phoneNo = cursor.getString(phoneIndex);
-        Contacts.add(phoneNo);
-
-
->>>>>>> 8fb8d066a88e5ee3ddbec38a802565e2d9cb1619
-    }
 }
