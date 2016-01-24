@@ -1,6 +1,10 @@
 package me.alihaghani.herenow;
 
 import android.app.Fragment;
+<<<<<<< Updated upstream
+=======
+import android.app.PendingIntent;
+>>>>>>> Stashed changes
 import android.content.Intent;
 import android.content.pm.PackageManager;
 import android.database.Cursor;
@@ -24,6 +28,23 @@ public class MainActivity extends FragmentActivity implements GoogleApiClient.On
     GoogleApiClient mGoogleApiClient;
     AutoCompleteAdapter mAdapter;
 
+<<<<<<< Updated upstream
+=======
+    private PendingIntent getGeofencePendingIntent() {
+        // Reuse the PendingIntent if we already have it.
+        if (mGeofencePendingIntent != null) {
+            return mGeofencePendingIntent;
+        }
+        Intent intent = new Intent(this, GeofenceTransitionsIntentService.class);
+        // We use FLAG_UPDATE_CURRENT so that we get the same pending intent back when
+        // calling addGeofences() and removeGeofences().
+        return PendingIntent.getService(this, 0, intent, PendingIntent.
+                FLAG_UPDATE_CURRENT);
+
+    }
+
+
+>>>>>>> Stashed changes
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
