@@ -16,6 +16,9 @@ import android.os.Bundle;
 import android.util.Log;
 import android.view.View;
 import android.widget.AutoCompleteTextView;
+import android.widget.Button;
+import android.widget.LinearLayout;
+import android.widget.TextView;
 
 import com.google.android.gms.common.ConnectionResult;
 import com.google.android.gms.common.api.GoogleApiClient;
@@ -29,25 +32,29 @@ import com.google.android.gms.location.places.Places;
 import com.google.android.gms.location.places.ui.PlaceAutocompleteFragment;
 import com.google.android.gms.location.places.ui.PlaceSelectionListener;
 import com.google.android.gms.maps.model.LatLng;
+import com.google.android.gms.common.api.ResultCallback;
 
 import java.util.ArrayList;
 import java.util.List;
 
 import static android.support.v4.app.ActivityCompat.startActivityForResult;
 
-public class MainActivity extends FragmentActivity implements GoogleApiClient.OnConnectionFailedListener, GoogleApiClient.ConnectionCallbacks {
+public class MainActivity extends FragmentActivity implements GoogleApiClient.OnConnectionFailedListener, GoogleApiClient.ConnectionCallbacks, ResultCallback<Status>{
 
     GoogleApiClient mGoogleApiClient;
     PendingIntent mGeofencePendingIntent;
     private LocationServices mLocationService;
     private double lat;
     private double lon;
-    private float radius = 1000;
-    private long expiration = 36000;
+    private float radius = 20; // 20 meters
+    private long expiration = 60*100*60*60; //in ms
+    private Intent intent; //intent for that will be fired
+    private boolean readyClicked = false;
 
 
+    //creating our pendingintent that will fire when we enter/dwell in the geofence
     private PendingIntent getGeofenceTransitionPendingIntent() {
-        Intent intent = new Intent(this, GeofenceTransitionsIntentService.class);
+        intent = new Intent(this, SendSMSReceiver.class);
         return PendingIntent.getService(this, 0, intent, PendingIntent.FLAG_UPDATE_CURRENT);
     }
 
@@ -57,7 +64,7 @@ public class MainActivity extends FragmentActivity implements GoogleApiClient.On
             super.onCreate(savedInstanceState);
 
             setContentView(R.layout.activity_main);
-            //--Snippet
+            //initialize GoogleApiClient to use APIs we need
             mGoogleApiClient = new GoogleApiClient
                     .Builder(this)
                     .enableAutoManage(this, 0, this)
@@ -68,11 +75,17 @@ public class MainActivity extends FragmentActivity implements GoogleApiClient.On
                     .addOnConnectionFailedListener(this)
                     .build();
 
+             //connect to the Google play services
              mGoogleApiClient.connect();
-        PlaceAutocompleteFragment autocompleteFragment = (PlaceAutocompleteFragment)
+
+            //initialize our google placeautocomplete fragment (using Google Places API)
+            PlaceAutocompleteFragment autocompleteFragment = (PlaceAutocompleteFragment)
                 getFragmentManager().findFragmentById(R.id.place_autocomplete_fragment);
 
+         //set the on selected listener
         autocompleteFragment.setOnPlaceSelectedListener(new PlaceSelectionListener() {
+
+            //when we select a place extract the info we need (lat and long)
             @Override
             public void onPlaceSelected(Place place) {
                 LatLng ourLatlng = place.getLatLng();
@@ -80,6 +93,7 @@ public class MainActivity extends FragmentActivity implements GoogleApiClient.On
                 lon = ourLatlng.longitude;
             }
 
+            //something went wrong, log it
             @Override
             public void onError(Status status) {
                 // TODO: Handle the error.
@@ -92,6 +106,7 @@ public class MainActivity extends FragmentActivity implements GoogleApiClient.On
 
     }
 
+        //try connecting again, just in case
         @Override
         protected void onStart() {
             super.onStart();
@@ -99,6 +114,8 @@ public class MainActivity extends FragmentActivity implements GoogleApiClient.On
                 mGoogleApiClient.connect();
         }
 
+
+        //disconnect from googleapiclient on application stop
         @Override
         protected void onStop() {
             if (mGoogleApiClient != null && mGoogleApiClient.isConnected()) {
@@ -106,13 +123,10 @@ public class MainActivity extends FragmentActivity implements GoogleApiClient.On
             }
             super.onStop();
 
-            if (mGoogleApiClient != null && mGoogleApiClient.isConnected()) {
-//                mAdapter.setGoogleApiClient(null);
-                mGoogleApiClient.disconnect();
-            }
-            super.onStop();
+
 
         }
+
 
 
         @Override
@@ -161,20 +175,41 @@ public class MainActivity extends FragmentActivity implements GoogleApiClient.On
     }
 
 
-    //wrapper to send an sms to the person they selected to notify
-    public void sendSMSToPerson(View view){
 
-
+    //hardcoded sms send since Geofence event handler isn't firing (for HackAZ purposes to demonstrate funcitonality)
+    @Override
+    public void onResult(Status status){
+        AndroidSMS smsSender = new AndroidSMS();
+        smsSender.sendSMS();
     }
 
+    //onClick handler for when they're ready to use our app
     public void onReadyToStart(View view){
+
+        //add a confirmation for the user
+        if(!readyClicked) {
+            TextView readyView = new TextView(getApplicationContext());
+            readyView.setBackgroundResource(R.drawable.border);
+            readyView.setTextColor(getResources().getColor(android.R.color.holo_green_light));
+            readyView.setText("Your text will be sent when you arrive at your location :)");
+            readyView.setTextAlignment(View.TEXT_ALIGNMENT_CENTER);
+            LinearLayout rootLinearLayout = (LinearLayout) findViewById(R.id.topLinearLayout);
+
+            rootLinearLayout.addView(readyView);
+
+            //set the ready button to green
+            Button readyBtn = (Button) findViewById(R.id.startButtonID);
+            readyBtn.setTextColor(getResources().getColor(android.R.color.holo_green_light));
+            readyClicked = true;
+        }
+
         if(mGoogleApiClient.isConnected()){
             Geofences geofences = new Geofences(lat, lon, radius, expiration);
 
             mGeofencePendingIntent = getGeofenceTransitionPendingIntent();
             if(ContextCompat.checkSelfPermission(getApplicationContext(),Manifest.permission.ACCESS_FINE_LOCATION) == PackageManager.PERMISSION_GRANTED
                     || ContextCompat.checkSelfPermission(getApplicationContext(),Manifest.permission.ACCESS_COARSE_LOCATION) == PackageManager.PERMISSION_GRANTED) {
-                LocationServices.GeofencingApi.addGeofences(mGoogleApiClient, Geofences.geofencingRequest , mGeofencePendingIntent);
+                LocationServices.GeofencingApi.addGeofences(mGoogleApiClient, Geofences.geofencingRequest , mGeofencePendingIntent).setResultCallback(this);
                 //below is deprecated
                 //LocationServices.GeofencingApi.addGeofences(mGoogleApiClient, Geofences.geoFenceList, mGeofencePendingIntent);
             }

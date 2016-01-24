@@ -16,6 +16,8 @@ public class Contacts extends HashSet {
     }
 
     public static HashSet<String> getNumbers(){
+        if(Contacts.numbers == null)
+            Contacts.numbers = new HashSet<String>();
         return Contacts.numbers;
     }
 

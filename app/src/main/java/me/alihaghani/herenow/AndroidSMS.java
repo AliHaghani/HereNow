@@ -17,7 +17,7 @@ public class AndroidSMS {
     SmsManager shortMessageManager;
 
     // Get array
-    HashSet<String> phoneNumberArray = Contacts.getNumbers();
+    HashSet<String> phoneNumberArray;
 
     String[] SMSNumbers;
     public AndroidSMS()
@@ -31,7 +31,7 @@ public class AndroidSMS {
 
 
 
-    String message = "Hi! Your friend has reached their destination.";
+    String message = "Hi! This is a text from HereNow to let you know your friend/family member has reached their destination.";
 
     public void sendSMS() {
 

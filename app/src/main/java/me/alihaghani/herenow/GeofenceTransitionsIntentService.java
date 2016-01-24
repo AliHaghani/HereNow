@@ -17,23 +17,19 @@ import java.util.List;
  */
 
 
-public class GeofenceTransitionsIntentService extends IntentService implements GoogleApiClient.ConnectionCallbacks,
-        GoogleApiClient.OnConnectionFailedListener {
+public class GeofenceTransitionsIntentService extends IntentService {
 
-    private GoogleApiClient mGoogleApiClient;
+    protected static final String TAG = "GeofenceTransitionsIS";
+    //private GoogleApiClient mGoogleApiClient;
 
     @Override
     public void onCreate(){
         super.onCreate();
-        mGoogleApiClient = new GoogleApiClient.Builder(this)
-                .addConnectionCallbacks(this)
-                .addOnConnectionFailedListener(this)
-                .build();
     }
 
 
     public GeofenceTransitionsIntentService(){
-        super(GeofenceTransitionsIntentService.class.getSimpleName());
+        super(TAG);
     }
 
 
@@ -42,10 +38,10 @@ public class GeofenceTransitionsIntentService extends IntentService implements G
 
 
 
+    @Override
     protected void onHandleIntent(Intent intent) {
         GeofencingEvent geofencingEvent = GeofencingEvent.fromIntent(intent);
         if (geofencingEvent.hasError()) {
-
             return;
         }
 
@@ -58,21 +54,8 @@ public class GeofenceTransitionsIntentService extends IntentService implements G
             AndroidSMS smsSender =  new AndroidSMS();
             smsSender.sendSMS();
 
+
         }
     }
 
-    @Override
-    public void onConnected(Bundle bundle) {
-
-    }
-
-    @Override
-    public void onConnectionSuspended(int i) {
-
-    }
-
-    @Override
-    public void onConnectionFailed(ConnectionResult connectionResult) {
-
-    }
 }

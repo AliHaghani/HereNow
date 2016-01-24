@@ -8,8 +8,18 @@
     android:paddingRight="@dimen/activity_horizontal_margin"
     android:paddingTop="@dimen/activity_vertical_margin"
     android:orientation="vertical"
-    tools:context="me.alihaghani.herenow.MainActivity">
+    android:background="@drawable/main_background"
+    tools:context="me.alihaghani.herenow.MainActivity"
+    android:id="@+id/mainLinearLayout"
+    >
 
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="0dp"
+        android:layout_weight="5"
+        android:orientation="vertical"
+        android:id="@+id/topLinearLayout"
+        >
     <LinearLayout
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
@@ -32,15 +42,25 @@
 
         ></Button>
 
+    </LinearLayout>
 
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="0dp"
+        android:layout_weight="1"
+        >
     <Button
         android:background="@drawable/border"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:text="I'm ready to start!"
+        android:text="@string/start_text"
+        android:textColor="@android:color/holo_red_dark"
         android:onClick="onReadyToStart"
+        android:id="@+id/startButtonID"
+        android:layout_gravity="center_horizontal"
         ></Button>
 
+    </LinearLayout>
 
 
 

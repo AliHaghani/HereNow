@@ -37,13 +37,16 @@ public class Geofences {
         Geofence.Builder builder = new Geofence.Builder();
         builder.setCircularRegion(lat, lon, radius);
         builder.setExpirationDuration(expiration);
-        builder.setTransitionTypes(Geofence.GEOFENCE_TRANSITION_ENTER);
+        builder.setTransitionTypes(Geofence.GEOFENCE_TRANSITION_DWELL | Geofence.GEOFENCE_TRANSITION_ENTER | Geofence.GEOFENCE_TRANSITION_EXIT);
         builder.setRequestId("ourGeofenceYO");
+        builder.setLoiteringDelay(0);
         ourFence = builder.build();
         geoFenceList.add(ourFence);
 
         GeofencingRequest.Builder reqBuilder = new GeofencingRequest.Builder();
+
         reqBuilder.addGeofence(ourFence);
+        //eqBuilder.setInitialTrigger(GeofencingRequest.INITIAL_TRIGGER_DWELL | Geo);
         geofencingRequest = reqBuilder.build();
 
     }

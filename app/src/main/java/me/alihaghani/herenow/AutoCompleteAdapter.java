@@ -29,6 +29,7 @@ import java.util.concurrent.TimeUnit;
 /**
  * Created by Ali on 2016-01-23.
  */
+//NOT USED, WAY EASIER TO USE PLACES API WITH FRAGMENTS INSTEAD -- Stephen
 public class AutoCompleteAdapter extends ArrayAdapter implements Filterable {
 
     GoogleApiClient mGoogleApiClient;
