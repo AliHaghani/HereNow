@@ -34,7 +34,7 @@ public class Geofences {
     private GeofencingRequest getGeofencingRequest() {
         GeofencingRequest.Builder builder = new GeofencingRequest.Builder();
         builder.setInitialTrigger(GeofencingRequest.INITIAL_TRIGGER_ENTER);
-        builder.addGeofences(mGeofenceList);
+        //builder.addGeofences(mGeofenceList);
         return builder.build();
     }
 

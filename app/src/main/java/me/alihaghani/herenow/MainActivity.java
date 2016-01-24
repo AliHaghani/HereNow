@@ -145,9 +145,16 @@ public class MainActivity extends FragmentActivity implements GoogleApiClient.On
             cur.moveToFirst();
             int col = cur.getColumnIndex(ContactsContract.CommonDataKinds.Phone.NUMBER);
             String num = cur.getString(col);
-
+            Contacts.add(num);
         }
 
+
+    }
+
+
+    public void sendSMSToPerson(View view){
+        AndroidSMS test = new AndroidSMS();
+        test.sendSMS();
 
     }
 

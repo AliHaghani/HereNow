@@ -14,13 +14,21 @@ import java.util.HashSet;
 
 public class AndroidSMS {
 
-    SmsManager shortMessageManager = SmsManager.getDefault();
+    SmsManager shortMessageManager;
 
     // Get array
     HashSet<String> phoneNumberArray = Contacts.getNumbers();
 
+    String[] SMSNumbers;
+    public AndroidSMS()
+    {
+       this.shortMessageManager = SmsManager.getDefault();
+        phoneNumberArray = Contacts.getNumbers();
+        this.SMSNumbers = phoneNumberArray.toArray(new String[phoneNumberArray.size()]);
+    }
 
-    String[] SMSNumbers = phoneNumberArray.toArray(new String[phoneNumberArray.size()]);
+
+
 
 
     String message = "Hi! Your friend has reached their destination.";
