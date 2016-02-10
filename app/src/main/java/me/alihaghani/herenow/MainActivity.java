@@ -46,7 +46,7 @@ public class MainActivity extends FragmentActivity implements GoogleApiClient.On
     private LocationServices mLocationService;
     private double lat;
     private double lon;
-    private float radius = 20; // 20 meters
+    private float radius = 5; // 20 meters
     private long expiration = 60*100*60*60; //in ms
     private Intent intent; //intent for that will be fired
     private boolean readyClicked = false;
@@ -165,10 +165,14 @@ public class MainActivity extends FragmentActivity implements GoogleApiClient.On
         if(requestCode == CONTACT_PICKER_RESULT) {
             Uri uri = data.getData();
             Cursor cur = getContentResolver().query(uri, null, null, null, null);
-            cur.moveToFirst();
-            int col = cur.getColumnIndex(ContactsContract.CommonDataKinds.Phone.NUMBER);
-            String num = cur.getString(col);
-            Contacts.add(num);
+            try {
+                cur.moveToFirst();
+                int col = cur.getColumnIndex(ContactsContract.CommonDataKinds.Phone.NUMBER);
+                String num = cur.getString(col);
+                Contacts.add(num);
+            }catch(NullPointerException n){
+
+            }
         }
 
 
@@ -176,7 +180,7 @@ public class MainActivity extends FragmentActivity implements GoogleApiClient.On
 
 
 
-    //hardcoded sms send since Geofence event handler isn't firing (for HackAZ purposes to demonstrate funcitonality)
+
     @Override
     public void onResult(Status status){
         AndroidSMS smsSender = new AndroidSMS();
@@ -209,7 +213,7 @@ public class MainActivity extends FragmentActivity implements GoogleApiClient.On
             mGeofencePendingIntent = getGeofenceTransitionPendingIntent();
             if(ContextCompat.checkSelfPermission(getApplicationContext(),Manifest.permission.ACCESS_FINE_LOCATION) == PackageManager.PERMISSION_GRANTED
                     || ContextCompat.checkSelfPermission(getApplicationContext(),Manifest.permission.ACCESS_COARSE_LOCATION) == PackageManager.PERMISSION_GRANTED) {
-                LocationServices.GeofencingApi.addGeofences(mGoogleApiClient, Geofences.geofencingRequest , mGeofencePendingIntent).setResultCallback(this);
+                LocationServices.GeofencingApi.addGeofences(mGoogleApiClient, Geofences.geofencingRequest, mGeofencePendingIntent);
                 //below is deprecated
                 //LocationServices.GeofencingApi.addGeofences(mGoogleApiClient, Geofences.geoFenceList, mGeofencePendingIntent);
             }

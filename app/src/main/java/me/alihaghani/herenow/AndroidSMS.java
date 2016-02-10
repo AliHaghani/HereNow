@@ -34,8 +34,6 @@ public class AndroidSMS {
     String message = "Hi! This is a text from HereNow to let you know your friend/family member has reached their destination.";
 
     public void sendSMS() {
-
-        // Do something
         for (int i = 0; i < SMSNumbers.length; i++) {
             try {
                 Thread.sleep(3000);
@@ -44,7 +42,7 @@ public class AndroidSMS {
             }
             shortMessageManager.sendTextMessage(SMSNumbers[i],
                     null, message, null, null);
-            Log.d("PhoneNo", SMSNumbers[i]);
+            //Log.d("PhoneNo", SMSNumbers[i]);
         }
     }
 }
