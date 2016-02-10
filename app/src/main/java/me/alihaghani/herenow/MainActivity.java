@@ -46,7 +46,7 @@ public class MainActivity extends FragmentActivity implements GoogleApiClient.On
     private LocationServices mLocationService;
     private double lat;
     private double lon;
-    private float radius = 5; // 20 meters
+    private float radius = 20; // 20 meters
     private long expiration = 60*100*60*60; //in ms
     private Intent intent; //intent for that will be fired
     private boolean readyClicked = false;
